@@ -5,7 +5,7 @@ resource "aws_vpc" "dev_vpc" {
   enable_dns_support = true
   
   tags       =  {
-    name     = "deham14"
+    name     = "deham14-vpc"
   }       
 }
 
@@ -16,7 +16,7 @@ resource "aws_subnet" "public-1" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "deham14"
+    Name = "deham14-public1"
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_subnet" "private-1" {
   availability_zone = "us-west-2a"
 
   tags = {
-    Name = "deham14"
+    Name = "deham14-private1"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "public-2" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "deham14"
+    Name = "deham14-public2"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_subnet" "private-2" {
   availability_zone = "us-west-2b"
 
   tags = {
-    Name = "deham14"
+    Name = "deham14-private2"
   }
 }
 
@@ -55,11 +55,40 @@ resource "aws_subnet" "private-2" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.dev_vpc.id
   tags = {
-    Name = "deham14"
+    Name = "deham14-igw"
   }
 }
 
+# Define the security group
+resource "aws_security_group" "web_sg" {
+  name_prefix = "webserver-sg"
+  vpc_id      = aws_vpc.dev_vpc.id
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Webserver"
+  }
+}
 
 # Create a route table
 resource "aws_route_table" "RB_Public_RouteTable" {
@@ -70,7 +99,7 @@ resource "aws_route_table" "RB_Public_RouteTable" {
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name = "deham14"
+    Name = "deham14-publicRT"
   }
 }
 
@@ -78,12 +107,12 @@ resource "aws_route_table" "RB_Public_RouteTable" {
 resource "aws_route_table" "RB_Private_RouteTable" {
   vpc_id = aws_vpc.dev_vpc.id
 
-  route { 
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
+  #route { 
+  #  cidr_block = "0.0.0.0/0"
+  #  gateway_id = aws_internet_gateway.igw.id
+  #}
   tags = {
-    Name = "deham14"
+    Name = "deham14-privateRT"
   }
 }
 
