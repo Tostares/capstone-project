@@ -16,7 +16,9 @@ health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
-    target              = "HTTP:80/"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
     interval            = 10
   }
 
@@ -29,7 +31,7 @@ resource "aws_lb" "application-lb" {
   internal           = false
   load_balancer_type = "application"
   subnets            = [aws_subnet.public-1.id,aws_subnet.public-2.id]
-  security_groups    = [aws_security_group.sg_vpc.id]
+  security_groups    = [aws_security_group.web_sg.id]
   ip_address_type    = "ipv4"
 
   tags = {
